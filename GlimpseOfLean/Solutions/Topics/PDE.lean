@@ -1,7 +1,7 @@
 import GlimpseOfLean.Library.Basic
 import Mathlib.Analysis.Calculus.ContDiff.Operations
 import Mathlib.Analysis.Calculus.Gradient.Basic
-import Mathlib.Analysis.InnerProductSpace.Laplacian
+import Mathlib.Analysis.InnerProductSpace.Harmonic.Basic
 
 set_option linter.unusedSectionVars false
 set_option autoImplicit false
@@ -89,6 +89,16 @@ lemma isClassicalSolution_laplaceEquation_iff (hU : IsOpen U) :
   refine ⟨fun h ↦ ⟨h.condDiffOn, ?_⟩, fun ⟨hu, hΔ⟩ ↦ ?_⟩
   · rwa [← ContDiffOn.isClassicalSolution_laplaceEquation_iff hU h.condDiffOn]
   · rwa [ContDiffOn.isClassicalSolution_laplaceEquation_iff hU hu]
+
+lemma isClassicalSolution_laplaceEquation_iff_harmonicOnNhd (hU : IsOpen U) :
+    IsClassicalSolution (laplaceEquation n) 2 U u ↔ HarmonicOnNhd u U := by
+  rw [isClassicalSolution_laplaceEquation_iff hU]
+  refine ⟨fun ⟨hu, hΔ⟩ x hxU ↦ ?_, fun h ↦ ⟨fun x hxU ↦ ?_, fun x hxU ↦ ?_⟩⟩
+  · refine ⟨ContDiffWithinAt.contDiffAt (s := U) (hu x hxU) (hU.mem_nhds hxU), ?_⟩
+    rw [Filter.EventuallyEq, eventually_nhds_iff]
+    exact ⟨U, hΔ, hU, hxU⟩
+  · exact (h x hxU).1.contDiffWithinAt
+  · exact Filter.EventuallyEq.eq_of_nhds (h x hxU).2
 
 def poissonEquation (n : ℕ) (f : ℝ[n] → ℝ) : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ :=
   fun p x ↦ - ∑ i : Fin (finrank ℝ ℝ[n]), p 2 ![e i, e i] - f x

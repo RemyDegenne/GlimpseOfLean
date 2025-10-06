@@ -1,4 +1,9 @@
-# Lean for PDEs Workshop
+# Lean for PDEs ICARM SLMath Workshop
+
+The practical sessions of the Lean for PDEs workshop have 3 parts:
+* An introduction to Lean: the short version of the glimpse of Lean tutorial by Patrick Massot
+* A file about calculus and PDEs
+* Group projects
 
 ## A glimpse of Lean - tutorial by Patrick Massot
 
@@ -8,7 +13,8 @@ or maybe devote half a day or a full day.
 
 There are two tracks. Both start with reading the `Introduction.lean` file.
 
-Then the short track continues in the `Shorter.lean` file which is meant to give
+Then the short track (which we choose in Lean for PDEs) continues in the `Shorter.lean` file
+which is meant to give
 you access to not completely empty mathematical proofs in two hours if you are
 ready to move pretty fast.
 

@@ -56,11 +56,25 @@ macro "ℝ[" n:term "]" : term => `(EuclideanSpace ℝ (Fin $n))
 /-- Notation for the standard orthonormal basis of `ℝ[n]` -/
 local notation "e" => stdOrthonormalBasis ℝ _
 
-variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   {n : ℕ} {U : Set ℝ[n]} {u f g : ℝ[n] → ℝ} {x : ℝ[n]}
-  {p : ℝ[n] → FormalMultilinearSeries ℝ ℝ[n] ℝ} {F : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ}
+  {p : V → FormalMultilinearSeries ℝ ℝ[n] ℝ} {F : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ}
 
-#check finrank_euclideanSpace_fin
+-- missing from the library (we have Fin0 and Fin1)
+def continuousMultilinearCurryFin2 (𝕜 : Type*) (G : Type*) (G' : Type*) [NontriviallyNormedField 𝕜]
+    [NormedAddCommGroup G] [NormedSpace 𝕜 G] [NormedAddCommGroup G'] [NormedSpace 𝕜 G'] :
+    ContinuousMultilinearMap 𝕜 (fun i : Fin 2 ↦ G) G' →ₗᵢ[𝕜] G →L[𝕜] G →L[𝕜] G' :=
+  let b := continuousMultilinearCurryLeftEquiv 𝕜 (n := 1) (fun _ ↦ G) G'
+  let a := continuousMultilinearCurryFin1 𝕜 G G'
+  (a.toLinearIsometry.postcomp (E := G)).comp b.toLinearIsometry
+
+-- variable (V) in
+-- /-- The Laplace equation. -/
+-- def laplaceEquation : FormalMultilinearSeries ℝ V ℝ → V → ℝ :=
+--   fun p _ ↦
+--   let a : V →L[ℝ] V →L[ℝ] ℝ := continuousMultilinearCurryFin2 ℝ V ℝ (p 2)
+--   let a' : V →L[ℝ] V := InnerProductSpace.continuousLinearMapOfBilin a
+--   a'.toLinearMap.trace ℝ V
 
 /-- The Laplace equation. -/
 def laplaceEquation (n : ℕ) : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ :=

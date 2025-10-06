@@ -1,7 +1,5 @@
 # Lean for PDEs Workshop
 
-* test file [here](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Freadme%2FGlimpseOfLean%2FIntroduction.lean)
-
 ## A glimpse of Lean - tutorial by Patrick Massot
 
 This repository is an introduction to theorem proving in Lean for the impatient.
@@ -29,6 +27,7 @@ website, you can use the [lean4web server](https://live.lean-lang.org/) hosted b
 
 * read [the introduction file](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FIntroduction.lean)
 * then read and edit the [explanations and exercises file](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FShorter.lean) of the shorter track.
+* After the basic tutorial, we'll learn about [differential calculus and PDEs](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2F04PDE.lean).
 
 If you want to do the longer track then the relevant links are:
 * [01Rewriting](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2F01Rewriting.lean)
@@ -38,6 +37,7 @@ If you want to do the longer track then the relevant links are:
 
 for the basics. And then you can choose depending on your mathematical
 interests:
+
 * [SequenceLimits](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FTopics%2FSequenceLimits.lean) for elementary properties of sequences of real numbers.
 * [RingTheory](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FTopics%2FRingTheory.lean) for some commutative algebra, up to the Chinese remainder theorem in commutatives rings.
 * [Probability](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FTopics%2FProbability.lean) for some probability theory.

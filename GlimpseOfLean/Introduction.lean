@@ -3,7 +3,7 @@ import GlimpseOfLean.Library.Basic
 namespace Introduction
 
 /-
-# TEST TEST TEST TEST
+# Introduction to this tutorial
 
 If you have a small screen and you are reading this in VSCode, you can press
 `alt-Z` (or `option-Z`) to enable word wrap.

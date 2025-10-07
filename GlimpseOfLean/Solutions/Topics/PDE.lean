@@ -1,5 +1,4 @@
-import GlimpseOfLean.Library.Basic
-import Mathlib
+import GlimpseOfLean.Library.PDE
 
 set_option linter.unusedSectionVars false
 set_option autoImplicit false
@@ -29,17 +28,17 @@ variable {E G : Type*} [NormedAddCommGroup E] [NormedAddCommGroup G]
 -- a value in `G`. This is how we could represent a generic PDE.
   {F : FormalMultilinearSeries 𝕜 E G → E → G}
 
-/-- A PDE has order at most `n` if its value on a function `u` at a point `x` depends only on
-the derivatives of `u` at `x` up to order `n`. -/
-structure IsOrder (n : ℕ) (F : FormalMultilinearSeries 𝕜 E G → E → G) : Prop where
-  congr {p q : FormalMultilinearSeries 𝕜 E G} (hpq : ∀ m ≤ n, p m = q m) : F p = F q
-
 /-- A function `u` is a classical solution of a PDE if it is sufficiently smooth and satisfies
 the PDE at every point in the domain. -/
 structure IsClassicalSolution (F : FormalMultilinearSeries 𝕜 E G → E → G) (n : ℕ∞) (U : Set E)
     (u : E → G) : Prop where
   condDiffOn : ContDiffOn 𝕜 n u U
   eq_zero : ∀ x ∈ U, F (ftaylorSeriesWithin 𝕜 u U x) x = 0
+
+/-- A PDE has order at most `n` if its value on a function `u` at a point `x` depends only on
+the derivatives of `u` at `x` up to order `n`. -/
+structure IsOrderAtMost (n : ℕ) (F : FormalMultilinearSeries 𝕜 E G → E → G) : Prop where
+  congr {p q : FormalMultilinearSeries 𝕜 E G} (hpq : ∀ m ≤ n, p m = q m) : F p = F q
 
 #check ContinuousMultilinearMap
 #check FormalMultilinearSeries
@@ -49,6 +48,21 @@ structure IsClassicalSolution (F : FormalMultilinearSeries 𝕜 E G → E → G)
 
 end AbstractPDE
 
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+
+example (p : FormalMultilinearSeries ℝ V ℝ) : V[×2]→L[ℝ] ℝ := p 2
+
+variable (V) in
+/-- The Laplace equation. -/
+def laplaceEquation : FormalMultilinearSeries ℝ V ℝ → V → ℝ :=
+  fun p _ ↦
+  -- `p 2` has type `V[×2]→L[ℝ] ℝ`. We transform it into a bilinear map `V →L[ℝ] V →L[ℝ] ℝ`
+  -- and then into `V →L[ℝ] V`
+  let a : V →L[ℝ] V →L[ℝ] ℝ := continuousMultilinearCurryFin2 ℝ V ℝ (p 2)
+  let a' : V →L[ℝ] V := InnerProductSpace.continuousLinearMapOfBilin a
+  -- we take the trace of that linear map
+  a'.toLinearMap.trace ℝ V
+
 section Real
 
 /-- `ℝ[n]` is notation for `EuclideanSpace ℝ (Fin n)` -/
@@ -56,99 +70,60 @@ macro "ℝ[" n:term "]" : term => `(EuclideanSpace ℝ (Fin $n))
 /-- Notation for the standard orthonormal basis of `ℝ[n]` -/
 local notation "e" => stdOrthonormalBasis ℝ _
 
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  {n : ℕ} {U : Set ℝ[n]} {u f g : ℝ[n] → ℝ} {x : ℝ[n]}
-  {p : V → FormalMultilinearSeries ℝ ℝ[n] ℝ} {F : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ}
+variable {n : ℕ} {U : Set ℝ[n]} {u f g : ℝ[n] → ℝ} {x : ℝ[n]}
+  {F : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ}
 
--- missing from the library (we have Fin0 and Fin1)
-def continuousMultilinearCurryFin2 (𝕜 : Type*) (G : Type*) (G' : Type*) [NontriviallyNormedField 𝕜]
-    [NormedAddCommGroup G] [NormedSpace 𝕜 G] [NormedAddCommGroup G'] [NormedSpace 𝕜 G'] :
-    ContinuousMultilinearMap 𝕜 (fun i : Fin 2 ↦ G) G' →ₗᵢ[𝕜] G →L[𝕜] G →L[𝕜] G' :=
-  let b := continuousMultilinearCurryLeftEquiv 𝕜 (n := 1) (fun _ ↦ G) G'
-  let a := continuousMultilinearCurryFin1 𝕜 G G'
-  (a.toLinearIsometry.postcomp (E := G)).comp b.toLinearIsometry
-
--- variable (V) in
--- /-- The Laplace equation. -/
--- def laplaceEquation : FormalMultilinearSeries ℝ V ℝ → V → ℝ :=
---   fun p _ ↦
---   let a : V →L[ℝ] V →L[ℝ] ℝ := continuousMultilinearCurryFin2 ℝ V ℝ (p 2)
---   let a' : V →L[ℝ] V := InnerProductSpace.continuousLinearMapOfBilin a
---   a'.toLinearMap.trace ℝ V
-
-/-- The Laplace equation. -/
-def laplaceEquation (n : ℕ) : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ :=
+/-- The Laplace equation. Alternative definition for `ℝ[n]` using the standard basis. -/
+def laplaceEquationRn (n : ℕ) : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ :=
   fun p _ ↦ ∑ i : Fin (finrank ℝ ℝ[n]), p 2 ![e i, e i]
 
-lemma isOrder_two_laplaceEquation : IsOrder 2 (laplaceEquation n) where
-  congr {p q} hpq := by unfold laplaceEquation; rw [hpq 2 le_rfl]
+lemma isOrderAtMost_two_laplaceEquation : IsOrderAtMost 2 (laplaceEquationRn n) where
+  congr {p q} hpq := by unfold laplaceEquationRn; rw [hpq 2 le_rfl]
 
-lemma ContDiffOn.isClassicalSolution_laplaceEquation_iff (hU : IsOpen U) (hu : ContDiffOn ℝ 2 u U) :
-    IsClassicalSolution (laplaceEquation n) 2 U u ↔ ∀ x ∈ U, Δ u x = 0 := by
+/-- There is a Laplacian `Δ u` in Mathlib. Being solution to the Laplace equation can be expressed
+with an equality of the Laplacian. -/
+lemma ContDiffOn.isClassicalSolution_laplaceEquationRn_iff
+    (hU : IsOpen U) (hu : ContDiffOn ℝ 2 u U) :
+    IsClassicalSolution (laplaceEquationRn n) 2 U u ↔ ∀ x ∈ U, Δ u x = 0 := by
   refine ⟨fun h x hx ↦ ?_, fun h ↦ ?_⟩
   · have h_eq := h.eq_zero x hx
-    simp only [laplaceEquation, ftaylorSeriesWithin] at h_eq
+    simp only [laplaceEquationRn, ftaylorSeriesWithin] at h_eq
     rw [laplacian_eq_iteratedFDeriv_stdOrthonormalBasis]
     suffices iteratedFDerivWithin ℝ 2 u U x = iteratedFDeriv ℝ 2 u x by simpa [this] using h_eq
     rw [iteratedFDerivWithin_eq_iteratedFDeriv hU.uniqueDiffOn _ hx]
     exact h.condDiffOn.contDiffAt (hU.mem_nhds hx)
   · refine ⟨hu, fun x hx ↦ ?_⟩
-    simp only [laplaceEquation, ftaylorSeriesWithin]
+    simp only [laplaceEquationRn, ftaylorSeriesWithin]
     rw [laplacian_eq_iteratedFDeriv_stdOrthonormalBasis] at h
     suffices iteratedFDerivWithin ℝ 2 u U x = iteratedFDeriv ℝ 2 u x by simpa [this] using h x hx
     rw [iteratedFDerivWithin_eq_iteratedFDeriv hU.uniqueDiffOn (hu.contDiffAt (hU.mem_nhds hx)) hx]
 
-lemma isClassicalSolution_laplaceEquation_iff (hU : IsOpen U) :
-    IsClassicalSolution (laplaceEquation n) 2 U u ↔ ContDiffOn ℝ 2 u U ∧ ∀ x ∈ U, Δ u x = 0 := by
+lemma isClassicalSolution_laplaceEquationRn_iff (hU : IsOpen U) :
+    IsClassicalSolution (laplaceEquationRn n) 2 U u ↔ ContDiffOn ℝ 2 u U ∧ ∀ x ∈ U, Δ u x = 0 := by
   refine ⟨fun h ↦ ⟨h.condDiffOn, ?_⟩, fun ⟨hu, hΔ⟩ ↦ ?_⟩
-  · rwa [← ContDiffOn.isClassicalSolution_laplaceEquation_iff hU h.condDiffOn]
-  · rwa [ContDiffOn.isClassicalSolution_laplaceEquation_iff hU hu]
-
-lemma isClassicalSolution_laplaceEquation_iff_harmonicOnNhd (hU : IsOpen U) :
-    IsClassicalSolution (laplaceEquation n) 2 U u ↔ HarmonicOnNhd u U := by
-  rw [isClassicalSolution_laplaceEquation_iff hU]
-  refine ⟨fun ⟨hu, hΔ⟩ x hxU ↦ ?_, fun h ↦ ⟨fun x hxU ↦ ?_, fun x hxU ↦ ?_⟩⟩
-  · refine ⟨ContDiffWithinAt.contDiffAt (s := U) (hu x hxU) (hU.mem_nhds hxU), ?_⟩
-    rw [Filter.EventuallyEq, eventually_nhds_iff]
-    exact ⟨U, hΔ, hU, hxU⟩
-  · exact (h x hxU).1.contDiffWithinAt
-  · exact Filter.EventuallyEq.eq_of_nhds (h x hxU).2
+  · rwa [← ContDiffOn.isClassicalSolution_laplaceEquationRn_iff hU h.condDiffOn]
+  · rwa [ContDiffOn.isClassicalSolution_laplaceEquationRn_iff hU hu]
 
 /-- The Poisson equation. -/
 def poissonEquation (n : ℕ) (f : ℝ[n] → ℝ) : FormalMultilinearSeries ℝ ℝ[n] ℝ → ℝ[n] → ℝ :=
   fun p x ↦ - ∑ i : Fin (finrank ℝ ℝ[n]), p 2 ![e i, e i] - f x
 
-lemma ContDiffOn.isClassicalSolution_poissonEquation_iff (hU : IsOpen U) (hu : ContDiffOn ℝ 2 u U) :
-    IsClassicalSolution (poissonEquation n f) 2 U u ↔ ∀ x ∈ U, - Δ u x = f x := by
-  refine ⟨fun h x hx ↦ ?_, fun h ↦ ?_⟩
-  · have h_eq := h.eq_zero x hx
-    simp only [poissonEquation, ftaylorSeriesWithin] at h_eq
-    rw [laplacian_eq_iteratedFDeriv_stdOrthonormalBasis]
-    simp only
-    rw [← sub_eq_zero]
-    suffices iteratedFDerivWithin ℝ 2 u U x = iteratedFDeriv ℝ 2 u x by simpa [this] using h_eq
-    rw [iteratedFDerivWithin_eq_iteratedFDeriv hU.uniqueDiffOn _ hx]
-    exact h.condDiffOn.contDiffAt (hU.mem_nhds hx)
-  · refine ⟨hu, fun x hx ↦ ?_⟩
-    simp only [poissonEquation, ftaylorSeriesWithin]
-    rw [laplacian_eq_iteratedFDeriv_stdOrthonormalBasis] at h
-    rw [sub_eq_zero]
-    suffices iteratedFDerivWithin ℝ 2 u U x = iteratedFDeriv ℝ 2 u x by simpa [this] using h x hx
-    rw [iteratedFDerivWithin_eq_iteratedFDeriv hU.uniqueDiffOn (hu.contDiffAt (hU.mem_nhds hx)) hx]
-
-/-- The Heat equation using the abstract formalism. -/
+/-- The Heat equation using the abstract formalism, in ℝ^n. -/
 def heatEquation (n : ℕ) : FormalMultilinearSeries ℝ ℝ[n+1] ℝ → ℝ[n+1] → ℝ :=
   fun p xt ↦ p 1 ![e ⟨n, by simp⟩]
-    - ∑ i : Fin (finrank ℝ ℝ[n+1]) with i ≤ ⟨n, by simp⟩, p 2 ![e i, e i]
+    - ∑ i : Fin (finrank ℝ ℝ[n+1]) with i < ⟨n, by simp⟩, p 2 ![e i, e i]
 
 /-- A more direct (and practical?) definition of classical solutions to the heat equation. -/
-def isClassicalHeatSolution (n : ℕ) (U : Set ℝ[n]) (u : ℝ[n] → ℝ → ℝ) : Prop :=
-  ContDiffOn ℝ 2 (fun xt : ℝ[n] × ℝ ↦ u xt.1 xt.2) (U ×ˢ Set.Ici 0)
-    ∧ ∀ x ∈ U, ∀ t, 0 ≤ t → deriv (fun s ↦ u x s) t - Δ (fun y ↦ u y t) x = 0
+def IsClassicalHeatSolution (n : ℕ) (U : Set ℝ[n]) (u : ℝ[n] → ℝ → ℝ) : Prop :=
+  ContDiffOn ℝ 2 (fun xt : ℝ[n] × ℝ ↦ u xt.1 xt.2) (U ×ˢ Set.Ioi 0)
+    ∧ ∀ x ∈ U, ∀ t, 0 < t → deriv (fun s ↦ u x s) t - Δ (fun y ↦ u y t) x = 0
 
 end Real
 
 section LowDimensional
+
+example {x y : ℝ} : deriv (fun x : ℝ ↦ x ^ 2 + y ^ 2) x = 2 * x := by
+ simp
 
 example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
     ∃ C, y = fun x ↦ C * Real.exp x := by
@@ -160,14 +135,16 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
     unfold g
     rw [deriv_mul]
     congr
-    · change deriv (Real.exp ∘ fun x => (-x)) x = _
+    · change deriv (Real.exp ∘ fun x ↦ (-x)) x = _
       rw [deriv_comp]
       simp only [Real.deriv_exp, deriv_neg'', mul_neg, mul_one]
       · fun_prop
       · fun_prop
-    · exact ydiff.differentiableAt
+    · -- hint: `Differentiable.differentiableAt`
+      exact ydiff.differentiableAt
     · fun_prop
   have hg' : deriv g = 0 := by
+    -- the `ext x` tactic can be used to introduce an `x` and change the goal to `deriv g x = 0 x`
     rw [hy] at hg
     ext x
     simp [g, hg]
@@ -183,16 +160,6 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
   rw [mul_assoc, ← Real.exp_add]
   simp
 
-example {x y : ℝ} : deriv (fun x : ℝ ↦ x ^ 2 + y ^ 2) x = 2 * x := by
- simp
-
 end LowDimensional
-
-/-- `∂[i] f` is notation for the partial derivative of `f` with respect to the `i`-th variable -/
-macro "∂[" i:term "]" : term => `(fun f x => fderiv ℝ f x (EuclideanSpace.single $i (1:ℝ)))
-/-- `∇ f` is notation for the gradient of `f` -/
-prefix:max " ∇ " => gradient
-/-- `𝕕 f` is notation for the derivative of `f` -/
-prefix:max " 𝕕 " => deriv
 
 end Tutorial

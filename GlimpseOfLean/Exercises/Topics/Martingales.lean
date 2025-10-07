@@ -1,5 +1,6 @@
 import Mathlib.Probability.Martingale.Convergence
 import Mathlib.Probability.Martingale.OptionalStopping
+import Mathlib.Probability.Martingale.OptionalSampling
 
 set_option linter.unusedSectionVars false
 set_option autoImplicit false
@@ -11,9 +12,9 @@ open scoped ENNReal NNReal Topology
 /-
 
 # Martingales
+-/
 
-
-We open namespaces. The effect is that after that command, we can call lemmas in those namespaces
+/- We open namespaces. The effect is that after that command, we can call lemmas in those namespaces
 without their namespace prefix: for example, we can write `inter_comm` instead of `Set.inter_comm`.
 Hover over `open` if you want to learn more. -/
 open MeasureTheory ProbabilityTheory Set
@@ -41,7 +42,8 @@ subtraction truncates to zero for example. If you find that lemma `lemma_name` u
 an equation does not apply to `ℝ≥0∞`, try to find a lemma named something like
 `ENNReal.lemma_name_of_something` and use that instead. -/
 
-/- A stochastic process indexed by `ℕ`: a function `ℕ → Ω → E`. Here `E` is a Banach space.
+/- A stochastic process indexed by `ℕ`: a function `ℕ → Ω → E`. Here `E` is a Banach space,
+a complete normed space (that's what the martingale property needs).
 We will often need a measurability condition on `X` in lemmas, but we don't add it yet. -/
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   {mE : MeasurableSpace E} {X : ℕ → Ω → E}
@@ -100,7 +102,7 @@ theorem ae_tendsto_limitProcess {Y : ℕ → Ω → ℝ} (hY : Submartingale Y �
   exact ⟨g, hgm, measure_eq_zero_of_trim_eq_zero hle hg⟩
 
 
-/-! ## Stopping and hitting times -/
+/-! ## Stopping times -/
 
 /- A stopping time with respect to a filtration is a random time `τ : Ω → ℕ` such that
 for all `n`, the set `{ω | τ ω ≤ n}` is measurable with respect to `𝓕 n`. -/
@@ -112,9 +114,27 @@ example (i : ℕ) : MeasurableSet[𝓕 i] {ω | τ ω ≤ i} := hτ.measurableSe
 /-- **The optional stopping theorem** (fair game theorem): an adapted integrable process `Y`
 is a submartingale if and only if for all bounded stopping times `τ` and `π` such that `τ ≤ π`, the
 stopped value of `Y` at `τ` has expectation smaller than its stopped value at `π`. -/
-theorem submartingale_iff_expected_stoppedValue_mono {Y : ℕ → Ω → ℝ} (hadp : Adapted 𝓕 Y)
+theorem submartingale_iff_expected_stoppedValue_mono' {Y : ℕ → Ω → ℝ} (hadp : Adapted 𝓕 Y)
     (hint : ∀ i, Integrable (Y i) P) :
-    Submartingale Y 𝓕 P ↔ ∀ τ π : Ω → ℕ, IsStoppingTime 𝓕 τ → IsStoppingTime 𝓕 π →
-      τ ≤ π → (∃ N, ∀ x, π x ≤ N) → P[stoppedValue Y τ] ≤ P[stoppedValue Y π] :=
+    Submartingale Y 𝓕 P ↔
+      ∀ τ π : Ω → ℕ, IsStoppingTime 𝓕 τ → IsStoppingTime 𝓕 π → τ ≤ π → (∃ N, ∀ x, π x ≤ N) →
+        P[stoppedValue Y τ] ≤ P[stoppedValue Y π] :=
   ⟨fun hf _ _ hτ hπ hle ⟨_, hN⟩ ↦ hf.expected_stoppedValue_mono hτ hπ hle hN,
     submartingale_of_expected_stoppedValue_mono hadp hint⟩
+
+/-- The stopped process of a submartingale with respect to a stopping time is a submartingale. -/
+protected theorem Submartingale.stoppedProcess {Y : ℕ → Ω → ℝ} (h : Submartingale Y 𝓕 P)
+    (hτ : IsStoppingTime 𝓕 τ) :
+    Submartingale (stoppedProcess Y τ) 𝓕 P := by
+  rw [submartingale_iff_expected_stoppedValue_mono]
+  · intro σ π hσ hπ hσ_le_π hπ_bdd
+    simp_rw [stoppedValue_stoppedProcess]
+    obtain ⟨n, hπ_le_n⟩ := hπ_bdd
+    exact h.expected_stoppedValue_mono (hσ.min hτ) (hπ.min hτ)
+      (fun ω ↦ min_le_min (hσ_le_π ω) le_rfl) fun ω ↦ (min_le_left _ _).trans (hπ_le_n ω)
+  · exact Adapted.stoppedProcess_of_discrete h.adapted hτ
+  · exact fun i ↦
+      h.integrable_stoppedValue ((isStoppingTime_const _ i).min hτ) fun ω ↦ min_le_left _ _
+
+/- See also the optional sampling theorem -/
+#check Martingale.stoppedValue_min_ae_eq_condExp

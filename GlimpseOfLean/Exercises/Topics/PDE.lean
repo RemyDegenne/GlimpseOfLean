@@ -130,9 +130,7 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
   use y 0
   let g : ℝ → ℝ := y * fun x ↦ Real.exp (-x)
   have diffg : Differentiable ℝ g := by
-    -- sorry
-    fun_prop
-    -- sorry
+    sorry
   have hg : deriv g = deriv y * (fun x ↦ Real.exp (-x)) + y * (fun x ↦ - Real.exp (-x)) := by
     ext x
     unfold g
@@ -140,38 +138,17 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
     congr
     · change deriv (Real.exp ∘ fun x ↦ (-x)) x = _
       rw [deriv_comp]
-      -- sorry
-      · simp
-      · fun_prop
-      · fun_prop
-      -- sorry
+      · sorry
+      · sorry
+      · sorry
     · -- hint: `Differentiable.differentiableAt`
-      -- sorry
-      exact ydiff.differentiableAt
-      -- sorry
-    · -- sorry
-      fun_prop
-      -- sorry
+      sorry
+    · sorry
   have hg' : deriv g = 0 := by
     -- the `ext x` tactic can be used to introduce an `x` and change the goal to `deriv g x = 0 x`
-    -- sorry
-    rw [hy] at hg
-    ext x
-    simp [g, hg]
-    -- sorry
+    sorry
   have fact : ∀ x u, g x = g u := is_const_of_deriv_eq_zero (f := g) diffg (by simp [hg'])
-  -- sorry
-  have g0 : g 0 = y 0 := by simp [g]
-  have fact' (x) : g x = g 0 := fact x 0
-  rw [g0] at fact'
-  unfold g at fact'
-  ext x
-  specialize fact' x
-  rw [← fact']
-  simp only [Pi.mul_apply]
-  rw [mul_assoc, ← Real.exp_add]
-  simp
-  -- sorry
+  sorry
 
 end LowDimensional
 

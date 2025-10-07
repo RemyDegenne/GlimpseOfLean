@@ -2,7 +2,7 @@
 
 The practical sessions of the Lean for PDEs workshop have 3 parts:
 * An introduction to Lean: the short version of the glimpse of Lean tutorial by Patrick Massot
-* A file about calculus and PDEs
+* Two files about specific topics: calculus and PDEs on one hand, and Martingales and stopping times on the other hand
 * Group projects
 
 ## A glimpse of Lean - tutorial by Patrick Massot
@@ -33,7 +33,9 @@ website, you can use the [lean4web server](https://live.lean-lang.org/) hosted b
 
 * read [the introduction file](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FIntroduction.lean)
 * then read and edit the [explanations and exercises file](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FShorter.lean) of the shorter track.
-* After the basic tutorial, we'll learn about **differential calculus and PDEs** (the link to the file will be available on Oct 7).
+* Read the file about [differential calculus and PDEs](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FTopics%2FPDE.lean).
+* Learn about [martingales and stopping times](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2FTopics%2FMartingales.lean)
+
 
 If you want to do the longer track then the relevant links are:
 * [01Rewriting](https://live.lean-lang.org/#project=GlimpseOfLean&url=https%3A%2F%2Fraw.githubusercontent.com%2FRemyDegenne%2FGlimpseOfLean%2Frefs%2Fheads%2Fmaster%2FGlimpseOfLean%2FExercises%2F01Rewriting.lean)

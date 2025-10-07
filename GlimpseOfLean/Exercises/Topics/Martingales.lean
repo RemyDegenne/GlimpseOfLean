@@ -20,7 +20,7 @@ open MeasureTheory ProbabilityTheory Set
 
 /- We define a measure space `Ω`: a type with a `MeasurableSpace Ω` variable (a σ-algebra) on which
 we also define a mesure `P : Measure Ω`.
-We then state that `P` is a probability measure. That is, `ℙ univ = 1`, where `univ : Set Ω` is the
+We then state that `P` is a probability measure. That is, `P univ = 1`, where `univ : Set Ω` is the
 universal set in `Ω` (the set that contains all `x : Ω`). -/
 variable {Ω : Type} {mΩ : MeasurableSpace Ω} {P : Measure Ω} [IsProbabilityMeasure P]
 

@@ -150,8 +150,7 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
       · sorry
       · sorry
       · sorry
-    · -- hint: `Differentiable.differentiableAt`
-      sorry
+    · sorry
     · sorry
   have hg' : deriv g = 0 := by
     -- the `ext x` tactic can be used to introduce an `x` and change the goal to `deriv g x = 0 x`

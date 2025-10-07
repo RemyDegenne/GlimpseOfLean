@@ -154,9 +154,8 @@ example (y : ℝ → ℝ) (ydiff : Differentiable ℝ y) (hy : deriv y = y) :
       · fun_prop
       · fun_prop
       -- sorry
-    · -- hint: `Differentiable.differentiableAt`
-      -- sorry
-      exact ydiff.differentiableAt
+    · -- sorry
+      fun_prop
       -- sorry
     · -- sorry
       fun_prop

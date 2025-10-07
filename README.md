@@ -2,7 +2,7 @@
 
 The practical sessions of the Lean for PDEs workshop have 3 parts:
 * An introduction to Lean: the short version of the glimpse of Lean tutorial by Patrick Massot
-* A file about calculus and PDEs
+* Two files about specific topics: calculus and PDEs on one hand, and Martingales and stopping times on the other hand
 * Group projects
 
 ## A glimpse of Lean - tutorial by Patrick Massot

@@ -12,11 +12,8 @@ open scoped ENNReal NNReal Topology
 
 # Martingales
 
-We introduce a probability space and events (measurable sets) on that space.
 
--/
-
-/- We open namespaces. The effect is that after that command, we can call lemmas in those namespaces
+We open namespaces. The effect is that after that command, we can call lemmas in those namespaces
 without their namespace prefix: for example, we can write `inter_comm` instead of `Set.inter_comm`.
 Hover over `open` if you want to learn more. -/
 open MeasureTheory ProbabilityTheory Set
